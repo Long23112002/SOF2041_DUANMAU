@@ -327,8 +327,10 @@ public class NhanVienView extends javax.swing.JFrame {
         char echoChar = txtPassword.getEchoChar();
         if (echoChar == '\u0000') {
             txtPassword.setEchoChar('*');
+            btnHide.setText("Hiện");
         } else {
             txtPassword.setEchoChar('\u0000');
+            btnHide.setText("Ẩn");
         }
     }//GEN-LAST:event_btnHideActionPerformed
 

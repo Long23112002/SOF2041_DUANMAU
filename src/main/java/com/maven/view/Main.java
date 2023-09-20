@@ -25,14 +25,14 @@ public class Main extends javax.swing.JFrame {
 
     public Main() {
         initComponents();
-        init();  
+        init();
     }
     
 
     private void init() {
         layout = new MigLayout("fill, insets 0");
         cover = new PanelCover();
-        loginAndRegister = new PanelLoginAndRegister();
+        loginAndRegister = new PanelLoginAndRegister(this);
         TimingTarget target = new TimingTargetAdapter() {
             @Override
             public void timingEvent(float fraction) {
@@ -92,8 +92,10 @@ public class Main extends javax.swing.JFrame {
                     animator.start();
                 }
             }
-        });
+        }); 
     }
+    
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

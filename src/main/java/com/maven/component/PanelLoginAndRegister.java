@@ -1,6 +1,5 @@
 package com.maven.component;
 
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -14,16 +13,18 @@ import com.maven.view.NhanVienView;
 import com.maven.swing.MyPasswordField;
 import com.maven.swing.MyTextField;
 
-
 public class PanelLoginAndRegister extends javax.swing.JLayeredPane {
 
-    public PanelLoginAndRegister() {
-
+    private NhanVienView nhanVienView;
+private Main mainInstance;
+    public PanelLoginAndRegister(Main mainInstance) {
+        this.mainInstance = mainInstance;
         initComponents();
         initRegister();
         initLogin();
         login.setVisible(false);
         register.setVisible(true);
+
     }
 
     private void initRegister() {
@@ -74,8 +75,13 @@ public class PanelLoginAndRegister extends javax.swing.JLayeredPane {
         cmd.addActionListener(e -> handelTest());
     }
 
-    private void handelTest(){
-    
+    public void handelTest() { 
+          if (mainInstance != null) {
+        mainInstance.setVisible(false);  // Hide the Main frame
+    }
+        nhanVienView = new NhanVienView();
+        nhanVienView.setVisible(true);
+     
     }
 
     public void showRegister(boolean show) {
