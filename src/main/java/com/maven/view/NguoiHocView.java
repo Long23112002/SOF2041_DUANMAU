@@ -5,12 +5,15 @@
 package com.maven.view;
 
 import com.maven.model.NguoiHoc;
+import com.maven.service.NguoiHocService;
 import com.maven.swing.EventPagination;
 import com.maven.until.HibernateUtil;
 import java.sql.PreparedStatement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -23,6 +26,9 @@ import org.hibernate.Transaction;
 public class NguoiHocView extends javax.swing.JFrame {
 
     DefaultTableModel model;
+    List<NguoiHoc> nguoiHocList = null;
+    private int index = -1;
+    NguoiHocService nhsv = new NguoiHocService();
 
     /**
      * Creates new form NguoiHocView
@@ -35,6 +41,144 @@ public class NguoiHocView extends javax.swing.JFrame {
                 loadData(page);
             }
         });
+    }
+
+    void fillTable(List<NguoiHoc> list) {
+        model.setRowCount(0);
+        for (NguoiHoc nguoiHoc : nguoiHocList) {
+            model.addRow(nguoiHoc.toData());
+        }
+    }
+
+    NguoiHoc readForm() {
+        String maNguoiHoc = txtMaNguoiHoc.getText();
+        String matKhau = txtMatKhau.getText();
+        boolean gioiTinh;
+        if (rdNam.isSelected()) {
+            gioiTinh = true;
+        } else {
+            gioiTinh = true;
+        }
+        Date ngaySinh = txtNgaySinh.getDate();
+        String email = txtEmail.getText();
+        String dienThoai = txtSoDienThoai.getText();
+        String ghiChu = txtGhiChu.getText();
+        String maNV = txtMaNhanVien.getText();
+        Date ngayDK = txtNgayDangKi.getDate();
+        return new NguoiHoc(maNguoiHoc, matKhau, gioiTinh, ngaySinh, email, dienThoai, ghiChu, maNV, ngayDK);
+    }
+
+    boolean validateData() {
+        if (txtMaNguoiHoc.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mã người học không được để trống");
+            txtMaNguoiHoc.requestFocus();
+            return false;
+        } else {
+            if (txtMaNguoiHoc.getText().length() > 7) {
+                JOptionPane.showMessageDialog(this, "Mã người học không quá 7 kí tự");
+                txtMaNguoiHoc.requestFocus();
+                return false;
+            }
+        }
+
+        if (txtMaNhanVien.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mã nhân viên không được để trống");
+            txtMaNhanVien.requestFocus();
+            return false;
+        } else {
+            if (txtMaNhanVien.getText().length() > 20) {
+                JOptionPane.showMessageDialog(this, "Mã nhân viên không được quá 20 kí tự");
+                txtMaNhanVien.requestFocus();
+                return false;
+            }
+        }
+
+        if (txtMatKhau.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống");
+            txtMatKhau.requestFocus();
+            return false;
+        } else {
+            if (txtMatKhau.getText().length() > 50) {
+                JOptionPane.showMessageDialog(this, "Mật khẩu không quá 50 kí tự");
+                txtMatKhau.requestFocus();
+                return false;
+            }
+        }
+
+        if (txtNgaySinh.getDate() == null) {
+            JOptionPane.showMessageDialog(this, "Hãy chọn ngày sinh");
+            return false;
+        }
+
+        if (txtNgayDangKi.getDate() == null) {
+            JOptionPane.showMessageDialog(this, "Hãy chọn ngày đăng kí");
+            return false;
+        }
+
+        if (txtEmail.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email không được để trống");
+            txtEmail.requestFocus();
+            return false;
+        } else {
+            if (!(txtEmail.getText().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))) {
+                JOptionPane.showMessageDialog(this, "Email sai định dạng");
+                txtEmail.requestFocus();
+                return false;
+            }
+            if (txtEmail.getText().length() > 50) {
+                JOptionPane.showMessageDialog(this, "Email không quá 50 kí tự");
+                txtEmail.requestFocus();
+                return false;
+            }
+        }
+        if (txtSoDienThoai.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại  không được để trống");
+            txtSoDienThoai.requestFocus();
+            return false;
+        } else {
+            if (!(txtSoDienThoai.getText().matches("^\\+?[0-9\\s\\-]+$"))) {
+                JOptionPane.showMessageDialog(this, "Số điện thoại sai định dạng");
+                txtSoDienThoai.requestFocus();
+                return false;
+            }
+            if (txtSoDienThoai.getText().length() > 10) {
+                JOptionPane.showMessageDialog(this, "Số điện thoại không được quá 10 số thứ tự");
+                txtSoDienThoai.requestFocus();
+                return false;
+            }
+        }
+
+        if (txtGhiChu.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ghi chú không được để trống");
+            txtGhiChu.requestFocus();
+            return false;
+        } else {
+            if (txtGhiChu.getText().length() > 225) {
+                JOptionPane.showMessageDialog(this, "Ghi chú không được quá 225 kí tự");
+                txtGhiChu.requestFocus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void showData(int index) {
+        NguoiHoc nh = nguoiHocList.get(index);
+        txtMaNguoiHoc.setText(nh.getMaNH());
+        txtEmail.setText(nh.getEmail());
+        txtGhiChu.setText(nh.getGhiChu());
+        txtMaNhanVien.setText(nh.getMaNV());
+        txtSoDienThoai.setText(nh.getDienThoai());
+        txtNgaySinh.setDate(nh.getNgaySinh());
+        txtNgayDangKi.setDate(nh.getNgayDK());
+        txtMatKhau.setText(nh.getMatKhau());
+        if (nh.getGioiTinh()) {
+            rdNam.setSelected(true);
+        } else {
+            rdNu.setSelected(true);
+        }
+
     }
 
     /**
@@ -57,7 +201,6 @@ public class NguoiHocView extends javax.swing.JFrame {
         rdNam = new com.maven.swing.RadioButtonCustom();
         jLabel4 = new javax.swing.JLabel();
         rdNu = new com.maven.swing.RadioButtonCustom();
-        rdKhac = new com.maven.swing.RadioButtonCustom();
         txtMatKhau = new com.maven.swing.PasswordField();
         btnHide = new com.maven.swing.Button();
         jLabel5 = new javax.swing.JLabel();
@@ -123,10 +266,6 @@ public class NguoiHocView extends javax.swing.JFrame {
         buttonGroup1.add(rdNu);
         rdNu.setText("Nữ");
 
-        rdKhac.setBackground(new java.awt.Color(51, 255, 51));
-        buttonGroup1.add(rdKhac);
-        rdKhac.setText("Khác");
-
         txtMatKhau.setLabelText("Mật Khẩu");
 
         btnHide.setText("Hide");
@@ -156,6 +295,11 @@ public class NguoiHocView extends javax.swing.JFrame {
         txtMaNhanVien.setLabelText("Mã nhân viên");
 
         btnThem.setText("Thêm ");
+        btnThem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThemActionPerformed(evt);
+            }
+        });
 
         btnSua.setText("Sửa");
 
@@ -191,14 +335,13 @@ public class NguoiHocView extends javax.swing.JFrame {
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                             .addComponent(jLabel4)
                                             .addGap(28, 28, 28)))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(txtNgaySinh, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                            .addGap(12, 12, 12)
                                             .addComponent(rdNam, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(42, 42, 42)
-                                            .addComponent(rdNu, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(34, 34, 34)
-                                            .addComponent(rdKhac, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(txtNgaySinh, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                            .addGap(71, 71, 71)
+                                            .addComponent(rdNu, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                             .addGap(183, 183, 183))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -233,8 +376,7 @@ public class NguoiHocView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rdNam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
-                    .addComponent(rdNu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(rdKhac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rdNu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(31, 31, 31)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtNgaySinh, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -272,6 +414,11 @@ public class NguoiHocView extends javax.swing.JFrame {
                 "Mã NH", "Mã NV", "Giới tính", "Ngày sinh", "Email", "Mật khẩu", "Điện thoại", "Ghi Chú", "Ngày ĐK"
             }
         ));
+        jtbNguoiHoc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtbNguoiHocMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jtbNguoiHoc);
         if (jtbNguoiHoc.getColumnModel().getColumnCount() > 0) {
             jtbNguoiHoc.getColumnModel().getColumn(8).setResizable(false);
@@ -346,7 +493,7 @@ public class NguoiHocView extends javax.swing.JFrame {
     }//GEN-LAST:event_txtEmailActionPerformed
     private void loadData(int page) {
 
-        int limit = 10; 
+        int limit = 10;
         int offset = (page - 1) * limit;
 
         try {
@@ -373,13 +520,10 @@ public class NguoiHocView extends javax.swing.JFrame {
                     .addEntity(NguoiHoc.class)
                     .setParameter("limit", limit)
                     .setParameter("offset", offset);
-            List<NguoiHoc> nguoiHocList = query.list();
+            nguoiHocList = query.list();
+            fillTable(nguoiHocList);
             tr.commit();
             session.close();
-
-            for (NguoiHoc nguoiHoc : nguoiHocList) {
-                model.addRow(nguoiHoc.toData());
-            }
 
             pagination1.setPagegination(page, totalPages);
             System.out.println("Tổng số trang: " + totalPages);
@@ -391,9 +535,26 @@ public class NguoiHocView extends javax.swing.JFrame {
 
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        int page = 5;
-        loadData(page);
+        loadData(1);
     }//GEN-LAST:event_formWindowOpened
+
+    private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
+        NguoiHoc nh = this.readForm();
+        if (validateData()) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn thêm người học ? ", "Thêm người học", JOptionPane.YES_NO_OPTION);
+            if (confirm == 0) {
+                if (nhsv.add(nh) != 0) {
+                    JOptionPane.showMessageDialog(this, "Thêm thành công");
+                    fillTable(nguoiHocList);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnThemActionPerformed
+
+    private void jtbNguoiHocMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtbNguoiHocMouseClicked
+        index = jtbNguoiHoc.getSelectedRow();
+        showData(index);
+    }//GEN-LAST:event_jtbNguoiHocMouseClicked
 
     /**
      * @param args the command line arguments
@@ -447,7 +608,6 @@ public class NguoiHocView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jtbNguoiHoc;
     private com.maven.swing.Pagination pagination1;
-    private com.maven.swing.RadioButtonCustom rdKhac;
     private com.maven.swing.RadioButtonCustom rdNam;
     private com.maven.swing.RadioButtonCustom rdNu;
     private com.maven.swing.TextArea textArea1;

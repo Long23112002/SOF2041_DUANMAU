@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.maven.repository;
+
 import com.maven.model.NguoiHoc;
 import com.maven.appservice.Dao_Interface;
 import com.maven.until.HibernateUtil;
@@ -14,15 +15,15 @@ import org.hibernate.Transaction;
  *
  * @author long0
  */
-public class NguoiHocRepo implements Dao_Interface<NguoiHoc>{
+public class NguoiHocRepo implements Dao_Interface<NguoiHoc> {
 
     @Override
     public List<NguoiHoc> getAll() {
         Transaction tr = null;
         List<NguoiHoc> listNH = null;
-        try (Session session = HibernateUtil.getFactory().openSession()){
+        try ( Session session = HibernateUtil.getFactory().openSession()) {
             tr = session.beginTransaction();
-            listNH = session.createQuery("SELECT u from NguoiHoc u",NguoiHoc.class).getResultList();
+            listNH = session.createQuery("SELECT u from NguoiHoc u", NguoiHoc.class).getResultList();
             session.close();
             return listNH;
         } catch (Exception e) {
@@ -33,7 +34,21 @@ public class NguoiHocRepo implements Dao_Interface<NguoiHoc>{
 
     @Override
     public int add(NguoiHoc t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Transaction tr = null;
+        try ( Session session = HibernateUtil.getFactory().openSession()) {
+            tr = session.beginTransaction();
+            session.save(t);
+            tr.commit();
+            session.close();
+            return 1;
+        } catch (Exception e) {
+            if (tr != null) {
+                tr.rollback();
+            }
+            e.printStackTrace();
+            return 0;
+
+        }
     }
 
     @Override
@@ -45,5 +60,5 @@ public class NguoiHocRepo implements Dao_Interface<NguoiHoc>{
     public int delete(NguoiHoc t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
 }
