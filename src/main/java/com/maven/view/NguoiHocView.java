@@ -7,7 +7,10 @@ package com.maven.view;
 import com.maven.model.NguoiHoc;
 import com.maven.service.NguoiHocService;
 import com.maven.swing.EventPagination;
+import com.maven.swing.PaginationItemRender;
+import com.maven.swing.PaginationItemRenderStyle1;
 import com.maven.until.HibernateUtil;
+import java.io.FileOutputStream;
 import java.sql.PreparedStatement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -15,9 +18,12 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -35,12 +41,64 @@ public class NguoiHocView extends javax.swing.JFrame {
      */
     public NguoiHocView() {
         initComponents();
+        getContentPane().setBackground(java.awt.Color.WHITE);
+        pagination1.setPaginationItemRender(new PaginationItemRenderStyle1());
         pagination1.addEventPagination(new EventPagination() {
             @Override
             public void pageChanged(int page) {
                 loadData(page);
             }
         });
+    }
+
+    private void exportToExcel(List<NguoiHoc> nguoiHocList) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("NguoiHocData");
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Mã người học");
+        headerRow.createCell(1).setCellValue("Mã Nhân Viên");
+        headerRow.createCell(2).setCellValue("Giới tính");
+        headerRow.createCell(3).setCellValue("Ngày Sinh");
+        headerRow.createCell(4).setCellValue("Email");
+        headerRow.createCell(5).setCellValue("Mật Khẩu");
+        headerRow.createCell(6).setCellValue("Điện thoại");
+        headerRow.createCell(7).setCellValue("Ghi chú");
+        headerRow.createCell(8).setCellValue("Ngày đăng kí");
+
+        int numRow = 1;
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        CreationHelper createHelper = workbook.getCreationHelper();
+        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy"));
+
+        for (NguoiHoc nguoiHoc : nguoiHocList) {
+            Row row = sheet.createRow(numRow++);
+            row.createCell(0).setCellValue(nguoiHoc.getMaNH());
+            row.createCell(1).setCellValue(nguoiHoc.getMaNV());
+            row.createCell(2).setCellValue(nguoiHoc.getGioiTinh());
+
+            // Định dạng ngày sinh
+            Cell ngaySinhCell = row.createCell(3);
+            ngaySinhCell.setCellValue(nguoiHoc.getNgaySinh());
+            ngaySinhCell.setCellStyle(dateCellStyle);
+
+            row.createCell(4).setCellValue(nguoiHoc.getEmail());
+            row.createCell(5).setCellValue(nguoiHoc.getMatKhau());
+            row.createCell(6).setCellValue(nguoiHoc.getDienThoai());
+            row.createCell(7).setCellValue(nguoiHoc.getGhiChu());
+
+            // Định dạng ngày đăng kí
+            Cell ngayDKCell = row.createCell(8);
+            ngayDKCell.setCellValue(nguoiHoc.getNgayDK());
+            ngayDKCell.setCellStyle(dateCellStyle);
+        }
+
+        try ( FileOutputStream out = new FileOutputStream("nguoihocdata.xlsx")) {
+            workbook.write(out);
+            System.out.println("Xuất file thành công");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Xuất file thất bại");
+        }
     }
 
     void fillTable(List<NguoiHoc> list) {
@@ -218,6 +276,7 @@ public class NguoiHocView extends javax.swing.JFrame {
         jtbNguoiHoc = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         pagination1 = new com.maven.swing.Pagination();
+        jButton1 = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("QUẢN LÍ NHÂN VIÊN");
@@ -237,6 +296,7 @@ public class NguoiHocView extends javax.swing.JFrame {
             }
         });
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -314,7 +374,7 @@ public class NguoiHocView extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addGap(272, 272, 272))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(242, Short.MAX_VALUE)
+                .addContainerGap(266, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
@@ -445,16 +505,29 @@ public class NguoiHocView extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton1.setText("Xuất Exel");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(35, 35, 35)))
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
@@ -464,6 +537,8 @@ public class NguoiHocView extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(42, 42, 42)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -556,6 +631,10 @@ public class NguoiHocView extends javax.swing.JFrame {
         showData(index);
     }//GEN-LAST:event_jtbNguoiHocMouseClicked
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        exportToExcel(nguoiHocList);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -597,6 +676,7 @@ public class NguoiHocView extends javax.swing.JFrame {
     private com.maven.swing.Button btnThem;
     private com.maven.swing.Button btnXoa;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
