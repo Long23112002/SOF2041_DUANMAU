@@ -4,6 +4,7 @@
  */
 package com.maven.until;
 
+import com.maven.model.NguoiHoc;
 import com.maven.model.NhanVien;
 import org.hibernate.SessionFactory;
 
@@ -43,6 +44,7 @@ public class HibernateUtil {
 
         conf.setProperties(properties);
         conf.addAnnotatedClass(NhanVien.class);
+        conf.addAnnotatedClass(NguoiHoc.class);
 
         ServiceRegistry registry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
         FACTORY = conf.buildSessionFactory(registry);
