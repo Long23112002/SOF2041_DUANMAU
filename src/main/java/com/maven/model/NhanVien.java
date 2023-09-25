@@ -4,9 +4,12 @@
  */
 package com.maven.model;
 
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -26,6 +29,12 @@ public class NhanVien {
     private String hoTen;
     @Column(name = "VAITRO")
     private Boolean vaiTro;
+    
+    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.ALL)
+    private List<KhoaHoc> khoaHocList;
+
+    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.ALL)
+    private List<NguoiHoc> nguoiHocList;
 
     public NhanVien() {
     }
@@ -68,8 +77,8 @@ public class NhanVien {
     public void setVaiTro(Boolean vaiTro) {
         this.vaiTro = vaiTro;
     }
-    
-    public Object[] toData(){
-        return new Object []{this.maNV,this.matKhau,this.hoTen,this.vaiTro};
+
+    public Object[] toData() {
+        return new Object[]{this.maNV, this.matKhau, this.hoTen, this.vaiTro};
     }
 }

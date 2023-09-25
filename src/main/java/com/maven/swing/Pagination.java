@@ -28,7 +28,7 @@ public class Pagination extends JPanel {
 
     private PaginationItemRender paginationItemRender;
     private List<EventPagination> events = new ArrayList<>();
-    private Page page;
+    public Page page;
 
     public Pagination() {
         init();

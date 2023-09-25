@@ -8,6 +8,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -21,30 +23,34 @@ public class NguoiHoc {
     @Id
     @Column(name = "MANH")
     private String maNH;
-    
+
     @Column(name = "MATKHAU")
     private String matKhau;
-    
+
     @Column(name = "GIOITINH")
     private Boolean gioiTinh;
-    
+
     @Column(name = "NGAYSINH")
     private Date ngaySinh;
-    
+
     @Column(name = "EMAIL")
     private String email;
-    
+
     @Column(name = "DIENTHOAI")
     private String dienThoai;
-    
+
     @Column(name = "GHICHU")
     private String ghiChu;
-    
+
     @Column(name = "MANV")
     private String maNV;
-    
+
     @Column(name = "NGAYDK")
     private Date ngayDK;
+
+    @ManyToOne
+    @JoinColumn(name = "MANV", insertable = false, updatable = false)
+    private NhanVien nhanVien;
 
     public NguoiHoc() {
     }
@@ -132,14 +138,14 @@ public class NguoiHoc {
     public void setNgayDK(Date ngayDK) {
         this.ngayDK = ngayDK;
     }
-    
-    public Object [] toData(){
-        return new Object[]{this.maNH,this.maNV
-                ,this.gioiTinh,this.ngaySinh
-                ,this.email,this.matKhau
-                ,this.dienThoai,this.dienThoai
-                ,this.ghiChu,this.ngayDK};
+
+    public Object[] toData() {
+        return new Object[]{
+            this.maNH, this.maNV,
+             this.gioiTinh, this.ngaySinh,
+             this.email, this.matKhau,
+             this.dienThoai, this.ghiChu,
+             this.ngayDK};
     }
-    
 
 }

@@ -16,17 +16,27 @@ import java.util.List;
 public class NguoiHocService{
    
     NguoiHocRepo nguoiHocRepo = new NguoiHocRepo();
-   
+    public List<NguoiHoc> getAll(){
+        return nguoiHocRepo.getAll();
+    }
     public int add(NguoiHoc t) {
        return  nguoiHocRepo.add(t);
     }
 
     public int update(NguoiHoc t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return nguoiHocRepo.update(t);
     }
 
     public int delete(NguoiHoc t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return nguoiHocRepo.delete(t);
+    }
+    
+    public int rowCount(){
+        return nguoiHocRepo.countNguoiHoc();
+    }
+    
+    public List<NguoiHoc> listPhanTrang(int limit, int offset){
+        return nguoiHocRepo.listNguoiHoc(limit, offset);
     }
     
 }
